@@ -10,17 +10,17 @@ jobs:
       - uses: actions/checkout@v2
       - name: Debug Information
         run: |
-          echo "HOST: ${{ secrets.HOST }}"
-          echo "USER: ${{ secrets.USERNAME }}"
+          echo "HOST value: ${{ secrets.HOST }}"
+          echo "USER value: ${{ secrets.USERNAME }}"
       - name: Deploy to DigitalOcean
         env:
-          HOST: ${{ secrets.HOST }}
-          USER: ${{ secrets.USERNAME }}
+          HOST_IP: ${{ secrets.HOST }}
+          USER_NAME: ${{ secrets.USERNAME }}
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > deploy_key
           chmod 600 deploy_key
-          echo "Attempting to connect to $USER@$HOST"
-          ssh -v -i deploy_key -o StrictHostKeyChecking=no $USER@$HOST '
+          echo "Attempting to connect to $USER_NAME@$HOST_IP"
+          ssh -v -i deploy_key -o StrictHostKeyChecking=no $USER_NAME@$HOST_IP '
             echo "Connected successfully"
             cd /path/to/your/app &&
             git pull origin main &&
