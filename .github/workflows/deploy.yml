@@ -8,6 +8,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Debug Information
+        run: |
+          echo "HOST: ${{ secrets.HOST }}"
+          echo "USER: ${{ secrets.USERNAME }}"
       - name: Deploy to DigitalOcean
         env:
           HOST: ${{ secrets.HOST }}
@@ -15,7 +19,9 @@ jobs:
         run: |
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > deploy_key
           chmod 600 deploy_key
-          ssh -i deploy_key -o StrictHostKeyChecking=no $USER@$HOST '
+          echo "Attempting to connect to $USER@$HOST"
+          ssh -v -i deploy_key -o StrictHostKeyChecking=no $USER@$HOST '
+            echo "Connected successfully"
             cd /path/to/your/app &&
             git pull origin main &&
             npm install &&
