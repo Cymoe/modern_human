@@ -23,3 +23,18 @@ jobs:
             whoami
             pwd
           '
+      - name: Ping Host
+        env:
+          HOST_IP: ${{ secrets.HOST }}
+        run: ping -c 4 $HOST_IP
+      - name: Debug Secrets
+        env:
+          HOST_IP: ${{ secrets.HOST }}
+          USER_NAME: ${{ secrets.USERNAME }}
+        run: |
+          echo "HOST_IP is set: $([[ -n $HOST_IP ]] && echo 'Yes' || echo 'No')"
+          echo "USER_NAME is set: $([[ -n $USER_NAME ]] && echo 'Yes' || echo 'No')"
+          echo "HOST_IP length: ${#HOST_IP}"
+          echo "USER_NAME length: ${#USER_NAME}"
+          echo "First character of HOST_IP: ${HOST_IP:0:1}"
+          echo "First character of USER_NAME: ${USER_NAME:0:1}"
