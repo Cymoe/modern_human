@@ -8,19 +8,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Debug Information
-        run: |
-          echo "HOST value: ${{ secrets.HOST }}"
-          echo "USER value: ${{ secrets.USERNAME }}"
       - name: Deploy to DigitalOcean
         env:
           HOST_IP: ${{ secrets.HOST }}
           USER_NAME: ${{ secrets.USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > deploy_key
+          echo "$SSH_PRIVATE_KEY" > deploy_key
           chmod 600 deploy_key
           echo "Attempting to connect to $USER_NAME@$HOST_IP"
-          # Use IP address directly in the SSH command
           ssh -v -i deploy_key -o StrictHostKeyChecking=no $USER_NAME@$HOST_IP '
             echo "Connected successfully"
             hostname
