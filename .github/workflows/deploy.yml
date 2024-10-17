@@ -1,32 +1,12 @@
-name: Deploy to DigitalOcean
+name: Debug DigitalOcean Connection
 on:
   push:
     branches: [main]
 
 jobs:
-  deploy:
+  debug:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Deploy to DigitalOcean
-        env:
-          HOST_IP: ${{ secrets.HOST }}
-          USER_NAME: ${{ secrets.USERNAME }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          echo "$SSH_PRIVATE_KEY" > deploy_key
-          chmod 600 deploy_key
-          echo "Attempting to connect to $USER_NAME@$HOST_IP"
-          ssh -v -i deploy_key -o StrictHostKeyChecking=no $USER_NAME@$HOST_IP '
-            echo "Connected successfully"
-            hostname
-            whoami
-            pwd
-          '
-      - name: Ping Host
-        env:
-          HOST_IP: ${{ secrets.HOST }}
-        run: ping -c 4 $HOST_IP
       - name: Debug Secrets
         env:
           HOST_IP: ${{ secrets.HOST }}
@@ -37,4 +17,41 @@ jobs:
           echo "HOST_IP length: ${#HOST_IP}"
           echo "USER_NAME length: ${#USER_NAME}"
           echo "First character of HOST_IP: ${HOST_IP:0:1}"
+          echo "Last character of HOST_IP: ${HOST_IP: -1}"
           echo "First character of USER_NAME: ${USER_NAME:0:1}"
+          
+      - name: Check IP Format
+        env:
+          HOST_IP: ${{ secrets.HOST }}
+        run: |
+          if [[ $HOST_IP =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "HOST_IP appears to be in correct IP format"
+          else
+            echo "HOST_IP does not appear to be in correct IP format"
+          fi
+          
+      - name: Ping Test
+        env:
+          HOST_IP: ${{ secrets.HOST }}
+        run: |
+          if ping -c 4 $HOST_IP; then
+            echo "Ping successful"
+          else
+            echo "Ping failed"
+          fi
+          
+      - name: DNS Lookup
+        env:
+          HOST_IP: ${{ secrets.HOST }}
+        run: |
+          nslookup $HOST_IP || echo "DNS lookup failed"
+          
+      - name: SSH Connection Test
+        env:
+          HOST_IP: ${{ secrets.HOST }}
+          USER_NAME: ${{ secrets.USERNAME }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          echo "$SSH_PRIVATE_KEY" > deploy_key
+          chmod 600 deploy_key
+          ssh -v -i deploy_key -o StrictHostKeyChecking=no -o ConnectTimeout=10 $USER_NAME@$HOST_IP 'echo "SSH connection successful"' || echo "SSH connection failed"
