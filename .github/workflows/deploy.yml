@@ -20,10 +20,10 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > deploy_key
           chmod 600 deploy_key
           echo "Attempting to connect to $USER_NAME@$HOST_IP"
+          # Use IP address directly in the SSH command
           ssh -v -i deploy_key -o StrictHostKeyChecking=no $USER_NAME@$HOST_IP '
             echo "Connected successfully"
-            cd /path/to/your/app &&
-            git pull origin main &&
-            npm install &&
-            pm2 restart your-app-name
+            hostname
+            whoami
+            pwd
           '
