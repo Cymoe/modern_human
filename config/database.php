@@ -112,6 +112,17 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'turso' => [
+            'driver' => 'sqlite',
+            'url' => env('DB_DATABASE'),
+            'database' => env('DB_DATABASE'),
+            'prefix' => '',
+            'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+            'options' => [
+                PDO::ATTR_TIMEOUT => 30,
+            ],
+        ],
+
     ],
 
     /*
